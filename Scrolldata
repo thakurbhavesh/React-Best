@@ -1,0 +1,105 @@
+import React, { useState, useEffect, useRef } from 'react';
+
+const App = () => {
+  const [data, setData] = useState([]); // All data
+  const [visibleData, setVisibleData] = useState([]); // Data visible on the screen
+  const [loading, setLoading] = useState(false); // Loading state
+  const [page, setPage] = useState(1); // Current page
+  const [hasMore, setHasMore] = useState(true); // Check if more data is available
+  const containerRef = useRef(null); // Ref for the container
+
+  // Sample data (100 records)
+  useEffect(() => {
+    const allData = Array.from({ length: 100 }, (_, i) => `Record ${i + 1}`);
+    setData(allData);
+    setVisibleData(allData.slice(0, 5)); // Initially show 5 records
+  }, []);
+
+  // Function to load more data (scroll down)
+  const loadMoreData = () => {
+    if (loading || !hasMore) return; // Avoid multiple calls or if no more data
+    setLoading(true);
+
+    // Simulate API call or data loading
+    setTimeout(() => {
+      const nextData = data.slice(visibleData.length, visibleData.length + 10); // Load next 10 records
+      if (nextData.length === 0) {
+        setHasMore(false); // No more data available
+      } else {
+        setVisibleData((prev) => [...prev, ...nextData]);
+      }
+      setLoading(false);
+    }, 1000); // Simulate delay
+  };
+
+  // Function to load previous data (scroll up)
+  const loadPreviousData = () => {
+    if (loading || !hasMore) return; // Avoid multiple calls or if no more data
+    setLoading(true);
+
+    // Simulate API call or data loading
+    setTimeout(() => {
+      const previousData = data.slice(
+        Math.max(0, visibleData[0].id - 11), // Load previous 10 records
+        visibleData[0].id - 1
+      );
+      if (previousData.length === 0) {
+        setHasMore(false); // No more data available
+      } else {
+        setVisibleData((prev) => [...previousData, ...prev]);
+      }
+      setLoading(false);
+    }, 1000); // Simulate delay
+  };
+
+  // Handle scroll event
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+
+      // Load more data when user reaches the bottom
+      if (scrollTop + clientHeight >= scrollHeight - 10) {
+        loadMoreData();
+      }
+
+      // Load previous data when user reaches the top
+      if (scrollTop === 0) {
+        loadPreviousData();
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [visibleData, loading, hasMore]);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        height: '300px',
+        overflowY: 'auto',
+        border: '1px solid #ccc',
+        padding: '10px',
+        position: 'relative',
+      }}
+    >
+      <h1>Scroll to Load More</h1>
+      {loading && <p style={{ textAlign: 'center' }}>Loading...</p>}
+      {!hasMore && visibleData.length === data.length && (
+        <p style={{ textAlign: 'center' }}>No more records available.</p>
+      )}
+      <ul>
+        {visibleData.map((record, index) => (
+          <li key={index} style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+            {record}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default App;
