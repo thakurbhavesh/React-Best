@@ -1,0 +1,138 @@
+import React, { useState } from "react";
+
+const App = () => {
+  const [isCodeMode, setIsCodeMode] = useState(false); // Code mode enable/disable
+  const [inputText, setInputText] = useState(""); // Input text
+  const [outputText, setOutputText] = useState(""); // Processed output text
+
+  // Function to detect programming language and framework
+  const detectLanguageAndFramework = (text) => {
+    const languages = {
+      javascript: ["function", "const", "let", "console.log", "=>", "this"],
+      typescript: ["interface", "type", "enum", "declare"],
+      python: ["def", "print", "import", "for", "lambda", "class"],
+      java: ["public", "class", "void", "System.out.println", "static"],
+      csharp: ["namespace", "class", "void", "Console.WriteLine", "var"],
+      php: ["<?php", "echo", "function", "class", "namespace"],
+      ruby: ["def", "class", "end", "puts", "require"],
+      go: ["package", "import", "func", "fmt.Println", "struct"],
+      swift: ["func", "let", "var", "print", "class", "struct"],
+      kotlin: ["fun", "val", "var", "println", "class", "data"],
+      rust: ["fn", "let", "mut", "println!", "struct", "impl"],
+    };
+  
+    const frameworks = {
+      react: ["React", "useState", "useEffect", "Component", "createElement"],
+      angular: ["NgModule", "Component", "Directive", "Service", "@Injectable"],
+      vue: ["Vue", "createApp", "ref", "computed", "watch"],
+      svelte: ["svelte", "onMount", "createEventDispatcher", "export let"],
+      nextjs: ["getServerSideProps", "getStaticProps", "next/router"],
+      nuxtjs: ["defineNuxtConfig", "useFetch", "useAsyncData"],
+      express: ["express", "app.get", "app.post", "app.use"],
+      django: ["from django", "def view", "class Meta", "urlpatterns"],
+      flask: ["from flask", "@app.route", "Flask", "request"],
+      laravel: ["Route::get", "Eloquent", "Blade", "Artisan"],
+      spring: ["@RestController", "@Autowired", "@GetMapping", "@SpringBootApplication"],
+      aspnet: ["[HttpGet]", "[HttpPost]", "ControllerBase", "Startup"],
+    };
+  
+    let detectedLanguage = "text";
+    let detectedFramework = "none";
+  
+    // Detect language
+    for (const lang in languages) {
+      if (languages[lang].some((keyword) => text.includes(keyword))) {
+        detectedLanguage = lang;
+        break;
+      }
+    }
+  
+    // Detect framework
+    for (const framework in frameworks) {
+      if (frameworks[framework].some((keyword) => text.includes(keyword))) {
+        detectedFramework = framework;
+        break;
+      }
+    }
+  
+    return { language: detectedLanguage, framework: detectedFramework };
+  };
+
+  // Handle input change
+  const handleInputChange = (e) => {
+    const text = e.target.value;
+    setInputText(text);
+
+    if (isCodeMode) {
+      const { language, framework } = detectLanguageAndFramework(text);
+      setOutputText(
+        `Detected Language: ${language}\nDetected Framework: ${framework}\n\n${text}`
+      );
+    } else {
+      setOutputText(text);
+    }
+  };
+
+  // Toggle code mode
+  const toggleCodeMode = () => {
+    setIsCodeMode(!isCodeMode);
+    setInputText(""); // Clear input on toggle
+    setOutputText(""); // Clear output on toggle
+  };
+
+  return (
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+      <h1>Code and Framework Detector</h1>
+      <button
+        onClick={toggleCodeMode}
+        style={{
+          padding: "10px 20px",
+          backgroundColor: isCodeMode ? "#4CAF50" : "#f44336",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+          marginBottom: "10px",
+        }}
+      >
+        {isCodeMode ? "Disable Code Mode" : "Enable Code Mode"}
+      </button>
+
+      <textarea
+        value={inputText}
+        onChange={handleInputChange}
+        placeholder={
+          isCodeMode
+            ? "Enter code here..."
+            : "Enter normal text here..."
+        }
+        style={{
+          width: "100%",
+          height: "100px",
+          padding: "10px",
+          borderRadius: "5px",
+          border: "1px solid #ccc",
+          marginBottom: "10px",
+          fontFamily: "monospace",
+        }}
+      />
+
+      <div
+        style={{
+          backgroundColor: "#f9f9f9",
+          padding: "10px",
+          borderRadius: "5px",
+          border: "1px solid #ddd",
+          whiteSpace: "pre-wrap",
+          fontFamily: isCodeMode ? "monospace" : "Arial, sans-serif",
+        }}
+      >
+        <strong>Output:</strong>
+        <br />
+        {outputText}
+      </div>
+    </div>
+  );
+};
+
+export default App;
