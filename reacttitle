@@ -1,0 +1,59 @@
+import React, { useState, useEffect } from 'react';
+
+function CounterTitle() {
+  // State to manage counter
+  const [count, setCount] = useState(0);
+  
+  // Base title
+  const baseTitle = "My App";
+
+  // useEffect to update document title when count changes
+  useEffect(() => {
+    if (count > 0) {
+      document.title = `${baseTitle} (${count})`;
+    } else {
+      document.title = baseTitle;
+    }
+  }, [count]); // Runs whenever count changes
+
+  // Functions to increment and decrement counter
+  const increment = () => {
+    setCount(prevCount => prevCount + 1);
+  };
+
+  const decrement = () => {
+    setCount(prevCount => Math.max(0, prevCount - 1)); // Prevents negative numbers
+  };
+
+  return (
+    <div style={{ textAlign: 'center', padding: '20px' }}>
+      <h1>{baseTitle}</h1>
+      <div>
+        <h2>Counter: {count}</h2>
+        <button 
+          onClick={increment}
+          style={{ margin: '0 10px', padding: '5px 15px' }}
+        >
+          Increment
+        </button>
+        <button 
+          onClick={decrement}
+          style={{ margin: '0 10px', padding: '5px 15px' }}
+        >
+          Decrement
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// App component
+function App() {
+  return (
+    <div>
+      <CounterTitle />
+    </div>
+  );
+}
+
+export default App;
